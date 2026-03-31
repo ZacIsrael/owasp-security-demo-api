@@ -1,23 +1,53 @@
-import express from "express";
+// Import the express framework to create and manage the web server
+import express, { Application, Request, Response } from "express";
+
+// Enables Cross-Origin Resource Sharing, allowing frontend apps on
+// different ports (like React) to make requests to this API
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-const app = express();
+// Loads environment variables from a `.env` file into process.env
+// Used for storing sensitive data like database credentials, API keys, etc.
+import dotenv from "dotenv";
+import { connectToPostgres } from "./database/postgres/connection";
+// Must be called immediately after importing to make env vars available
+dotenv.config();
 
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
-}));
+// Create an Express application instance
+const app: Application = express();
 
+// Define the port in which the Express server will listen on
+const port: number = parseInt(process.env.PORT || "5000", 10);
+
+// connect to postgreSQL database
+connectToPostgres();
+
+// Enable cross-origin requests with credentials for production and development
+// Ensure origin matches frontend URL(s) exactly
+app.use(
+  cors({
+    origin: [
+      // frontend url (for development)
+      "http://localhost:3000",
+      // if/when the frontend gets deployed, its url goes here
+      // "https://real-app-frontend-domain.com"
+    ],
+    credentials: true,
+  })
+);
+
+// Parses incoming HTTP requests with JSON payloads
+// and makes the parsed data available on req.body
 app.use(express.json());
+
+// Parse cookies from incoming requests
+// Required for reading refresh tokens stored in httpOnly cookies
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("API running");
 });
 
-const PORT = 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
