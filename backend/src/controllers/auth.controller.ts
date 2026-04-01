@@ -82,3 +82,35 @@ const login = asyncHandler(
     sendTokenResponse(user, token, 200, res);
   }
 );
+
+// Logs a user out
+const logout = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Clear the auth cookie by overwriting it with an expired value
+    res.cookie("token", "none", {
+      // Prevents JavaScript (e.g., document.cookie) from accessing the cookie,
+      // which helps protect against XSS attacks stealing the JWT
+      httpOnly: true,
+
+      // Sets the cookie to expire almost immediately (1 second from now),
+      // effectively instructing the browser to delete it
+      expires: new Date(Date.now() + 1000),
+
+      // Restricts the browser from sending the cookie on cross-site requests,
+      // providing protection against CSRF attacks
+      sameSite: "strict",
+
+      // Specifies that the cookie is valid for the entire application (all routes)
+      path: "/",
+
+      // Ensures the cookie is only sent over HTTPS in production environments,
+      // preventing it from being exposed over insecure HTTP connections
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  }
+);
