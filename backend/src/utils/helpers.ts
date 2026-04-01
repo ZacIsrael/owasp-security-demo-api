@@ -1,8 +1,49 @@
+// This file contains a list of helper functions
+// that will get commonly reused
+
 // Import bcrypt to hash passwords securely (automatically adds a salt and hashes it)
 import bcrypt from "bcrypt";
+
+// Import sanitize-html library to clean user input and
+// remove malicious HTML/JS
+import sanitizeHtml from "sanitize-html";
+
 
 export async function hashPassword(password: string): Promise<string> {
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   return hashedPassword;
 }
+
+
+// Utility function to ensure a value is a non-empty trimmed string
+// Used for required string validation
+export const isNonEmptyString = (value: unknown): value is string =>
+    typeof value === "string" && value.trim().length > 0;
+  
+
+// Utility function to check if a value is a boolean
+// Prevents truthy / falsy non-boolean values
+export const isBoolean = (value: unknown): value is boolean =>
+    typeof value === "boolean";
+
+// Utility function to sanitize user-provided text input (prevents XSS payloads)
+export const sanitizePlainText = (value: string): string =>
+    // Sanitize input by trimming whitespace and stripping ALL HTML tags/attributes
+    sanitizeHtml(value.trim(), {
+      // Disallow all HTML tags (forces plain text only)
+      allowedTags: [],
+      // Disallow all HTML attributes (removes things like onerror, onclick, etc.)
+      allowedAttributes: {},
+    });
+
+// Ensures the incoming value is a plain object before destructuring.
+// Prevents invalid types like null, arrays, or primitives from being
+// treated as valid request payloads.
+export const assertIsObject = (data: unknown, errorMessage = "Request data must be a valid object"): Record<string, unknown> => {
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      throw new Error(errorMessage);
+    }
+  
+    return data as Record<string, unknown>;
+  };
