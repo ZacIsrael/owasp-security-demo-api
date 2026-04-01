@@ -47,7 +47,7 @@ export const register = asyncHandler(
 );
 
 // Logs a user in
-const login = asyncHandler(
+export const login = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // req.body has already been validated and normalized by validateBody(LoginDTO)
     const { email, password } = req.body;
@@ -84,7 +84,7 @@ const login = asyncHandler(
 );
 
 // Logs a user out
-const logout = asyncHandler(
+export const logout = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Clear the auth cookie by overwriting it with an expired value
     res.cookie("token", "none", {
