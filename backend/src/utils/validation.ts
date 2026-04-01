@@ -88,7 +88,7 @@ export const isValidEmail = (value: unknown): value is string => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // Returns boolean value that indicates whether or not the value passed in
-  // is a correctly formatted email; test() function compares the value to the 
+  // is a correctly formatted email; test() function compares the value to the
   // emailRegex regex expression.
   return emailRegex.test(email);
 };
@@ -120,17 +120,30 @@ export const isValidPassword = (value: unknown): value is string => {
   return password.length >= 8 && password.length <= 128;
 };
 
-/**
- * Validates whether a value is a valid MongoDB ObjectId.
- *
- * Important for route params like:
- * - /bootcamps/:id
- * - /courses/:id
- * - /reviews/:id
- * - /users/:id
- */
+// Validates whether a value is a valid MongoDB ObjectId.
+// Important for route params like:
+// - /bootcamps/:id
+// - /courses/:id
+// - /reviews/:id
+// - /users/:id
+
 export const isValidMongoObjectId = (value: unknown): value is string => {
   return typeof value === "string" && mongoose.Types.ObjectId.isValid(value);
+};
+
+// Validates whether a value is a valid UUID (structure of IDs in PostgreSQL tables)
+export const isValidUUID = (value: unknown): value is string => {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const uuid = value.trim();
+
+  // UUID v1–v5 regex (most common validation)
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  return uuidRegex.test(uuid);
 };
 
 /**
