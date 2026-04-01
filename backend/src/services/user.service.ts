@@ -38,4 +38,28 @@ export const userService = {
       user,
     };
   },
+
+  // Retrieve a user by their email; used for login controller function
+  async getUserByEmail(email: string): Promise<{ user: User | null }> {
+    // Vulnerable & bad practice: No password hashing
+    // Vulnerable to SQL Injection attack
+    const result = await db.query(
+      `SELECT * FROM ${usersTable} WHERE email = '${email}'`
+    );
+
+    // Proper way to prevent SQL Injection attack
+    // const result = await db.query(
+    //   `SELECT * FROM ${usersTable} WHERE email = ($1)`,
+    //   [email]
+    // );
+
+    // Schema enforces unique emails so no need to check if
+    // there is more than 1 user with the same email.
+    // Either the user with that email has been found or they don't exist.
+    const user: User | null = result.rows[0] || null;
+
+    return {
+      user,
+    };
+  },
 };
