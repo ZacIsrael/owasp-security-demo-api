@@ -103,6 +103,11 @@ export class CreateUserDTO {
       }
 
       const sanitizedBio = sanitizePlainText(bio.trim());
+
+      if (sanitizedBio.length > 500) {
+        throw new Error("Bio can't exceed 500 characters");
+      }
+
       this.bio = sanitizedBio;
     } else {
       this.bio = "";
