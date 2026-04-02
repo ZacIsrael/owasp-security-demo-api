@@ -114,3 +114,18 @@ export const logout = asyncHandler(
     });
   }
 );
+
+// Get the currently authenticated user's profile
+export const getMe = asyncHandler(
+  async (req: any, res: Response, next: NextFunction) => {
+    // Debugging purposes
+    console.log('req.user = ', req.user);
+    // req.user is populated by the protect middleware (auth.middleware.ts) after JWT verification
+    const user = await userService.getUserById(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  }
+);
