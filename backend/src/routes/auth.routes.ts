@@ -1,11 +1,12 @@
 // Import the Express framework for building HTTP servers
 import express from "express";
 
-import { register, login, logout } from "../controllers/auth.controller";
+import { register, login, logout, getMe } from "../controllers/auth.controller";
 
 import { CreateUserDTO, LoginUserDTO } from "../dtos/user.dto";
 
 import { validateBody } from "../middleware/validate.middleware";
+import { protect } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
@@ -21,5 +22,8 @@ router.post("/login", login);
 
 // Log a user out
 router.post("/logout", logout);
+
+// Retrieves the user that's currently logged in
+router.get("/me", protect, getMe);
 
 export default router;
