@@ -1,11 +1,11 @@
 // Import the Express framework for building HTTP servers
 import express from "express";
 
-import { register, login, logout } from "../controllers/auth.controller.js";
+import { register, login, logout } from "../controllers/auth.controller";
 
-import { CreateUserDTO, LoginUserDTO } from "../dtos/user.dto.js";
+import { CreateUserDTO, LoginUserDTO } from "../dtos/user.dto";
 
-import { validateBody } from "../middleware/validate.middleware.js";
+import { validateBody } from "../middleware/validate.middleware";
 
 const router = express.Router();
 
