@@ -1,9 +1,15 @@
 // Import the Express framework for building HTTP servers
 import express from "express";
 
-import { register, login, logout, getMe } from "../controllers/auth.controller";
+import {
+  register,
+  login,
+  logout,
+  getMe,
+  updateDetails,
+} from "../controllers/auth.controller";
 
-import { CreateUserDTO, LoginUserDTO } from "../dtos/user.dto";
+import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
 
 import { validateBody } from "../middleware/validate.middleware";
 import { protect } from "../middleware/auth.middleware";
@@ -25,5 +31,22 @@ router.post("/logout", logout);
 
 // Retrieves the user that's currently logged in
 router.get("/me", protect, getMe);
+
+// Executed when a user wants to update their display_name, email, or bio
+router.patch(
+  "/updatedetails",
+  protect,
+  validateBody(UpdateUserDTO),
+  updateDetails
+);
+
+// vulnerable
+/*
+router.patch(
+  "/updatedetails",
+  protect,
+  updateDetails
+);
+*/
 
 export default router;
