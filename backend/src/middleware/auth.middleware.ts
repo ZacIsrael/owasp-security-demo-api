@@ -2,13 +2,13 @@
 import jwt from "jsonwebtoken";
 
 // Wrapper to handle async errors and pass them to Express error middleware
-import { asyncHandler } from "./async.middleware.js";
+import { asyncHandler } from "./async.middleware";
 
 import type { NextFunction, Request, Response } from "express";
-import type { User } from "../interfaces/user.interface.js";
+import type { User } from "../interfaces/user.interface";
 
 // postgres client object that allows interaction with the database
-import { db } from "../database/postgres/connection.js";
+import { db } from "../database/postgres/connection";
 
 // Load environment variables from config file
 import dotenv from "dotenv";
