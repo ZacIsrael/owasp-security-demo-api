@@ -167,7 +167,7 @@ export class UpdateUserDTO {
   display_name?: string;
   bio?: string;
 
-  constructor(data: UpdateUserBody) {
+  constructor(data: unknown) {
     // Ensure that the data parameter is a valid object
     const payload = assertIsObject(data, "Request body must be a valid object");
 
