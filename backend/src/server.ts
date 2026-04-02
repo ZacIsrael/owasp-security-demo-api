@@ -6,10 +6,14 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
+// import routes
+import authRouter from "./routes/auth.routes";
+
 // Loads environment variables from a `.env` file into process.env
 // Used for storing sensitive data like database credentials, API keys, etc.
 import dotenv from "dotenv";
 import { connectToPostgres } from "./database/postgres/connection";
+import { errorHandler } from "./middleware/error.middleware";
 // Must be called immediately after importing to make env vars available
 dotenv.config();
 
@@ -17,7 +21,7 @@ dotenv.config();
 const app: Application = express();
 
 // Define the port in which the Express server will listen on
-const port: number = parseInt(process.env.PORT || "5000", 10);
+const port: number = parseInt(process.env.PORT || "8000", 10);
 
 // connect to postgreSQL database
 connectToPostgres();
@@ -43,6 +47,14 @@ app.use(express.json());
 // Parse cookies from incoming requests
 // Required for reading refresh tokens stored in httpOnly cookies
 app.use(cookieParser());
+
+// API version
+const API_VERSION = 1;
+
+// import routes
+app.use(`/api/v${API_VERSION}/auth`, authRouter);
+
+app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API running");
