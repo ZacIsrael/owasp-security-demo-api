@@ -4,6 +4,7 @@ import {
   CreateUserInterface,
   LoginUserInterface,
 } from "../interfaces/user.interface";
+import { UpdateUserBody } from "../types/user.types";
 import {
   assertIsObject,
   isBoolean,
@@ -153,5 +154,73 @@ export class LoginUserDTO implements LoginUserInterface {
     }
 
     this.password = password;
+  }
+}
+
+export class UpdateUserDTO {
+  email?: string;
+  display_name?: string;
+  bio?: string;
+
+  constructor(data: UpdateUserBody) {
+    // Ensure that the data parameter is a valid object
+    const payload = assertIsObject(data, "Request body must be a valid object");
+
+    // Only allow fields users are permitted to update here.
+    rejectUnknownFields(payload, ["display_name", "email", "bio"]);
+
+    // destructure object
+    const { display_name, email, bio } = payload;
+
+    if (
+      email === undefined &&
+      display_name === undefined &&
+      bio === undefined
+    ) {
+      throw new Error(
+        "At least one of the following fields must be updated: display_name, email, bio"
+      );
+    }
+
+    if (email !== undefined) {
+      // Ensure that the email passed in is valid
+      if (!isValidEmail(email)) {
+        throw new Error("A valid email address is required");
+      }
+
+      // Assign trimmed & lowercased validated email; entries in the database need to be consistent
+      this.email = email.trim().toLowerCase();
+    }
+
+    if (display_name !== undefined) {
+      if (!isNonEmptyString(display_name)) {
+        throw new Error("Name must be a non-empty string");
+      }
+
+      // Sanitize user-provided display_name input to strip malicious HTML/JS (XSS prevention)
+      const sanitizedDisplayName = sanitizePlainText(display_name.trim());
+
+      // Enforce max length defined in schema
+      if (sanitizedDisplayName.length > 100) {
+        throw new Error("Name can't be longer than 100 characters");
+      }
+
+      // Assign validated name to DTO
+      this.display_name = sanitizedDisplayName;
+    }
+
+    if (bio !== undefined) {
+      if (!isNonEmptyString(bio)) {
+        throw new Error("bio must be a non-empty string when provided");
+      }
+
+      const sanitizedBio = sanitizePlainText(bio.trim());
+
+      if (sanitizedBio.length > 500) {
+        throw new Error("Bio can't exceed 500 characters");
+      }
+
+      this.bio = sanitizedBio;
+    }
   }
 }
