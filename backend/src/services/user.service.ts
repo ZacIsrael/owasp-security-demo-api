@@ -62,4 +62,21 @@ export const userService = {
       user,
     };
   },
+
+  // Retrieve a user by its id
+  async getUserById(id: string): Promise<{ user: User | null }> {
+    // vulnerable way
+    const result = await db.query(
+      `SELECT * FROM users WHERE id = '${id}' LIMIT 1`
+    );
+
+    // Proper way
+    // const result = await db.query(`SELECT * FROM users WHERE id = $1 LIMIT 1`, [
+    //   id,
+    // ]);
+
+    const user: User | null = result.rows[0] || null;
+
+    return { user };
+  },
 };
