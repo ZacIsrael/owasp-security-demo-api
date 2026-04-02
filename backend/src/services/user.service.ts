@@ -16,14 +16,14 @@ export const userService = {
     // Proper way; data is sanitized via data transfer object
     // dto: CreateUserDTO
   ): Promise<{ user: User }> {
+    // Proper way: hash password
+    const hashedPassword = await hashPassword(dto.password);
+
     // Vulnerable & bad practice: No password hashing
     // Vulnerable to SQL Injection attack
     const result = await db.query(
-      `INSERT INTO ${usersTable} (email, display_name, password_hash) VALUES ('${dto.email}', '${dto.display_name}', '${dto.password}') RETURNING *`
+      `INSERT INTO ${usersTable} (email, display_name, password_hash) VALUES ('${dto.email}', '${dto.display_name}', '${hashedPassword}') RETURNING *`
     );
-
-    // Proper way: hash password
-    // const hashedPassword = await hashPassword(dto.password);
 
     // Proper way to prevent SQL Injection attack
     // const result = await db.query(
