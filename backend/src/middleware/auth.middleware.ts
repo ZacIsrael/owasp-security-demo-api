@@ -16,9 +16,13 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
+// Create a safe version of the User type by excluding sensitive fields (e.g., password_hash)
+// so that confidential data is not propagated through the request object
+type SafeUser = Omit<User, "password_hash">;
+
 // Extend Express Request so req.user is properly typed
 export interface AuthenticatedRequest extends Request {
-  user?: User;
+  user?: SafeUser;
 }
 
 // JWT payload shape expected from your app
@@ -92,8 +96,11 @@ export const protect = asyncHandler(
         });
       }
 
+      // Remove sensitive fields before attaching user to request
+      const { password_hash, ...safeUser } = user;
+
       // Attach authenticated user row to request object
-      req.user = user;
+      req.user = safeUser;
 
       // Continue to next middleware/route handler
       next();
