@@ -17,6 +17,8 @@ import { ErrorResponse } from "../utils/errorResponse";
 import { comparePassword } from "../utils/helpers";
 import { generateJwt } from "../utils/auth.util";
 import { sendTokenResponse } from "../utils/auth-response.util";
+import { UpdateUserDTO } from "../dtos/user.dto";
+import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
 export const register = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -119,10 +121,34 @@ export const logout = asyncHandler(
 export const getMe = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
     // Debugging purposes
-    console.log('req.user = ', req.user);
+    console.log("req.user = ", req.user);
     // req.user is populated by the protect middleware (auth.middleware.ts) after JWT verification
     const user = await userService.getUserById(req.user.id);
 
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  }
+);
+
+// Patch request for updating a user's name & email
+export const updateDetails = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    // req.body has already been validated by validateBody(UpdateUserDTO) in auth.route.ts
+    const dto = new UpdateUserDTO(req.body);
+
+    if (!req.user) {
+      throw new ErrorResponse("Unauthorized: no authenticated user", 401);
+    }
+    // Debugging purposes
+    // console.log("req.user = ", req.user);
+
+    // req.user is populated by the protect middleware (auth.middleware.ts) after JWT verification
+    const user = await userService.updateUserById(req.user.id, dto);
+    if (!user) {
+      throw new ErrorResponse("User not found", 404);
+    }
     res.status(200).json({
       success: true,
       data: user,
