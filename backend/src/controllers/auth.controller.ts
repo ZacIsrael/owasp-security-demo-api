@@ -119,7 +119,10 @@ export const logout = asyncHandler(
 
 // Get the currently authenticated user's profile
 export const getMe = asyncHandler(
-  async (req: any, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      throw new ErrorResponse("Unauthorized: no authenticated user", 401);
+    }
     // Debugging purposes
     console.log("req.user = ", req.user);
     // req.user is populated by the protect middleware (auth.middleware.ts) after JWT verification
