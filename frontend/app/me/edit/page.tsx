@@ -1,7 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import PageContainer from "@/components/ui/page-container";
+import Card from "@/components/ui/card";
+import Input from "@/components/ui/input";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
 
 type User = {
   email: string;
@@ -18,6 +24,7 @@ export default function EditMePage() {
   const [message, setMessage] = useState("Loading user details...");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -31,6 +38,7 @@ export default function EditMePage() {
 
         if (!res.ok) {
           setMessage(data?.error || "Unauthorized");
+          setIsError(true);
           router.push("/login");
           return;
         }
@@ -39,6 +47,7 @@ export default function EditMePage() {
 
         if (!user) {
           setMessage("No user found.");
+          setIsError(true);
           return;
         }
 
@@ -46,9 +55,11 @@ export default function EditMePage() {
         setDisplayName(user.display_name ?? "");
         setBio(user.bio ?? "");
         setMessage("");
+        setIsError(false);
       } catch (error) {
         console.error(error);
         setMessage("Failed to load user details.");
+        setIsError(true);
       } finally {
         setIsLoading(false);
       }
@@ -61,6 +72,7 @@ export default function EditMePage() {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage("Updating profile...");
+    setIsError(false);
 
     try {
       const res = await fetch(
@@ -82,12 +94,14 @@ export default function EditMePage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage(data?.error || "Failed to update profile");
+        setMessage(data?.error || "Failed to update profile.");
+        setIsError(true);
         setIsSubmitting(false);
         return;
       }
 
       setMessage("Profile updated successfully.");
+      setIsError(false);
 
       setTimeout(() => {
         router.push("/me");
@@ -95,6 +109,7 @@ export default function EditMePage() {
     } catch (error) {
       console.error(error);
       setMessage("Request failed while updating profile.");
+      setIsError(true);
       setIsSubmitting(false);
     }
   };
@@ -104,52 +119,80 @@ export default function EditMePage() {
   };
 
   return (
-    <main style={{ padding: "2rem", maxWidth: "600px" }}>
-      <h1>Edit Details</h1>
+    <PageContainer>
+      <Card
+        title="Edit Profile"
+        description="Update your profile details for this demo account."
+      >
+        {isLoading ? (
+          <Alert message={message} type={isError ? "error" : "success"} />
+        ) : (
+          <div className="space-y-4">
+            {message ? (
+              <Alert message={message} type={isError ? "error" : "success"} />
+            ) : null}
 
-      {isLoading ? (
-        <p>{message}</p>
-      ) : (
-        <>
-          {message && <p>{message}</p>}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                id="displayName"
+                type="text"
+                label="Display Name"
+                placeholder="Enter your display name"
+                value={displayName}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setDisplayName(e.target.value)
+                }
+                required
+              />
 
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: "grid", gap: "1rem", marginBottom: "1rem" }}
-          >
-            <input
-              type="text"
-              placeholder="Display name"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-            />
+              <Input
+                id="email"
+                type="email"
+                label="Email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
+                required
+              />
 
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+              <div className="space-y-2">
+                <label
+                  htmlFor="bio"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Bio
+                </label>
 
-            <textarea
-              placeholder="Bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows={5}
-            />
+                <textarea
+                  id="bio"
+                  placeholder="Tell us a little about yourself"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={5}
+                  className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                />
+              </div>
 
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Submit Changes"}
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button type="submit" fullWidth disabled={isSubmitting}>
+                  {isSubmitting ? "Saving..." : "Submit Changes"}
+                </Button>
 
-              <button type="button" onClick={handleCancel}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </>
-      )}
-    </main>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  fullWidth
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+      </Card>
+    </PageContainer>
   );
 }

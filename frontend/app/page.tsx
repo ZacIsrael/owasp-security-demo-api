@@ -1,24 +1,27 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import PageContainer from "@/components/ui/page-container";
+import Card from "@/components/ui/card";
+import Button from "@/components/ui/button";
 
 export default function HomePage() {
-  const router = useRouter();
-
   return (
-    <main style={{ padding: "2rem", maxWidth: "500px", textAlign: "center" }}>
-      <h1>Security Demo App</h1>
-      <p>OWASP Security Practices Demo</p>
+    <PageContainer>
+      <Card
+        title="OWASP Security Demo"
+        description="A simple frontend for demonstrating common web vulnerabilities and their defenses."
+      >
+        <div className="space-y-3">
+          <Link href="/register" className="block">
+            <Button fullWidth>Register</Button>
+          </Link>
 
-      <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <button onClick={() => router.push("/login")}>
-          Go to Login
-        </button>
-
-        <button onClick={() => router.push("/register")}>
-          Go to Register
-        </button>
-      </div>
-    </main>
+          <Link href="/login" className="block">
+            <Button variant="secondary" fullWidth>
+              Login
+            </Button>
+          </Link>
+        </div>
+      </Card>
+    </PageContainer>
   );
 }

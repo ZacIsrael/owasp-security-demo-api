@@ -1,7 +1,14 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+import PageContainer from "@/components/ui/page-container";
+import Card from "@/components/ui/card";
+import Input from "@/components/ui/input";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -9,10 +16,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("Logging in...");
+    setIsError(false);
 
     try {
       const res = await fetch("http://localhost:8000/api/v1/auth/login", {
@@ -30,46 +39,65 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage(data?.error || "Login failed");
+        setMessage(data?.error || "Login failed.");
+        setIsError(true);
         return;
       }
 
       setMessage("Login successful. Redirecting...");
+      setIsError(false);
       router.push("/me");
     } catch (error) {
       setMessage("Request failed.");
+      setIsError(true);
       console.error(error);
     }
   };
 
   return (
-    <main style={{ padding: "2rem", maxWidth: "500px" }}>
-      <h1>Login Demo</h1>
+    <PageContainer>
+      <Card
+        title="Login"
+        description="Sign in to access your profile and continue the security demo."
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            id="email"
+            type="email"
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1rem" }}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <Input
+            id="password"
+            type="password"
+            label="Password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          {message ? (
+            <Alert message={message} type={isError ? "error" : "success"} />
+          ) : null}
 
-        <button type="submit">Log In</button>
-      </form>
+          <Button type="submit" fullWidth>
+            Log In
+          </Button>
+        </form>
 
-      <p>{message}</p>
-      <div style={{ marginTop: "1rem" }}>
-        <button type="button" onClick={() => router.push("/register")}>
-          Go to Register
-        </button>
-      </div>
-    </main>
+        <div className="mt-6">
+          <Link href="/register" className="block">
+            <Button type="button" variant="secondary" fullWidth>
+              Go to Register
+            </Button>
+          </Link>
+        </div>
+      </Card>
+    </PageContainer>
   );
 }
