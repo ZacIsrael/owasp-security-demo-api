@@ -18,6 +18,8 @@ export const generateJwt = (userId: string): string => {
   const expiresIn: SignOptions["expiresIn"] =
     (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) || "3h";
 
+  // Signs and returns a JWT containing the user's ID as the payload,
+  // using the server's secret key and an expiration time for secure authentication
   return jwt.sign(
     // payload
     { id: userId },

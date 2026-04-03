@@ -14,7 +14,7 @@ export const sendTokenResponse = (
 
   // Configure cookie options for authentication token
   const options = {
-    // Set expiration date for cookie
+    // Set expiration date for cookie (3 hours from the current moment in time)
     expires: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000),
     // Prevent JavaScript access to cookie (mitigates XSS)
     httpOnly: true,

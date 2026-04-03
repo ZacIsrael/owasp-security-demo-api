@@ -37,6 +37,8 @@ router.get("/me", protect, getMe);
 router.patch(
   "/updatedetails",
   protect,
+  // Add csrf protection; if this line is commented out,
+  // then the API is to susceptible to csrf attacks
   csrfProtection,
   validateBody(UpdateUserDTO),
   updateDetails
@@ -46,8 +48,10 @@ router.patch(
 router.post(
   "/updatedetails-demo",
   protect,
-  // add csrf protection
+  // Add csrf protection; if this line is commented out,
+  // then the API is to susceptible to csrf attacks
   csrfProtection,
+  validateBody(UpdateUserDTO),
   updateDetails
 );
 

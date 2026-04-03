@@ -16,7 +16,7 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-// Create a safe version of the User type by excluding sensitive fields (e.g., password_hash)
+// Safe version of the User type by excluding sensitive fields (e.g., password_hash)
 // so that confidential data is not propagated through the request object
 type SafeUser = Omit<User, "password_hash">;
 
@@ -25,7 +25,7 @@ export interface AuthenticatedRequest extends Request {
   user?: SafeUser;
 }
 
-// JWT payload shape expected from your app
+// JWT payload shape expected from the app
 interface JwtPayload {
   id: string;
 }
@@ -88,7 +88,7 @@ export const protect = asyncHandler(
         });
       }
 
-      // Optional but recommended: prevent inactive users from accessing routes
+      // Prevent inactive users from accessing routes (not necessary/out of scope for this security demo)
       if (!user.is_active) {
         return res.status(403).json({
           success: false,
@@ -96,7 +96,8 @@ export const protect = asyncHandler(
         });
       }
 
-      // Remove sensitive fields before attaching user to request
+      // Remove sensitive fields (in this case, password_hash is the only 
+      // sensitive field) before attaching user to request
       const { password_hash, ...safeUser } = user;
 
       // Attach authenticated user row to request object

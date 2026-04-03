@@ -26,16 +26,28 @@ export default function EditMePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  // Runs after component mounts to fetch authenticated user data
+  // Re-runs if router instance changes
   useEffect(() => {
+    // Async function to retrieve current user's profile from backend
+    // Handles API call, response parsing, and state updates
     const loadUser = async () => {
+      // Wrap API call in try/catch to handle network or runtime errors
+      // Ensures graceful failure handling
       try {
+        // Send GET request to /auth/me with cookies included for authentication
+        // credentials: "include" allows HttpOnly JWT cookie to be sent
         const res = await fetch("http://localhost:8000/api/v1/auth/me", {
           method: "GET",
           credentials: "include",
         });
 
+        // Parse JSON response body from API
+        // Expected to contain success flag and user data
         const data = await res.json();
 
+        // If response is not OK (e.g., 401 Unauthorized), handle error state
+        // Redirect user to login page
         if (!res.ok) {
           setMessage(data?.error || "Unauthorized");
           setIsError(true);
@@ -43,29 +55,55 @@ export default function EditMePage() {
           return;
         }
 
+        // Safely extract user object from nested response
+        // Fallback to null if not present
         const user: User | null = data?.data?.user ?? null;
 
+        // If user is missing, set error state and stop execution
+        // Prevents accessing undefined properties
         if (!user) {
           setMessage("No user found.");
           setIsError(true);
           return;
         }
 
+        // Populate email state, defaulting to empty string if undefined
+        // Ensures controlled input values
         setEmail(user.email ?? "");
+
+        // Populate display name state with fallback to empty string
+        // Prevents uncontrolled input issues
         setDisplayName(user.display_name ?? "");
+
+        // Populate bio state with fallback to empty string
+        // Ensures UI consistency
         setBio(user.bio ?? "");
+
+        // Clear any previous messages and reset error state
+        // Indicates successful data load
         setMessage("");
         setIsError(false);
+
+        // Catch any runtime or network errors during fetch or parsing
+        // Logs error and updates UI state accordingly
       } catch (error) {
         console.error(error);
         setMessage("Failed to load user details.");
         setIsError(true);
+
+        // Runs regardless of success or failure
+        // Stops loading spinner or loading state
       } finally {
         setIsLoading(false);
       }
     };
 
+    // Invoke the async function to fetch user data
+    // Executes immediately after component mounts
     loadUser();
+
+    // Dependency array ensures effect runs when router changes
+    // Prevents unnecessary re-renders
   }, [router]);
 
   // Handle profile update form submission
@@ -103,6 +141,8 @@ export default function EditMePage() {
           // Set headers including CSRF token for protection
           headers: {
             "Content-Type": "application/json",
+            // csrf token must exist and be the valid token for this user
+            // otherwise, this request will not be executed (go to dev tools and delete it to show proof)
             "x-csrf-token": csrfToken,
           },
 

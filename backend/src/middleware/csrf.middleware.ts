@@ -35,7 +35,8 @@ export const csrfProtection = (
     });
   }
 
-  // Ensure request is authenticated (protect middleware in routes should run first)
+  // Ensure request is authenticated (protect middleware in routes should run first
+  // but if for some reason it does not, catch the error)
   if (!req.user) {
     return res.status(401).json({
       success: false,
@@ -73,6 +74,9 @@ export const csrfProtection = (
     });
   }
 
+  // Origin (scheme + domain + port): Origin: http://localhost:3000
+  // Referer (full URL path): Referer: http://localhost:3000/me/edit
+
   // Extract Origin header to validate request source
   const origin = req.header("origin");
 
@@ -87,7 +91,7 @@ export const csrfProtection = (
   // Extract Referer header as fallback when Origin is missing
   const referer = req.header("referer");
 
-  // Validate Referer against trusted origins if Origin is not present
+  // Validate Referer against trusted origins if Origin is not present for whatever reason
   if (!origin && referer) {
     const isTrustedReferer = TRUSTED_ORIGINS.some((trustedOrigin) =>
       referer.startsWith(trustedOrigin)

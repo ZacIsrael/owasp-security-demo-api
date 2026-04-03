@@ -77,7 +77,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Store CSRF token for future state-changing requests
+      // Store CSRF token in session storage for 
+      // future state-changing (POST, PATCH, PUT, DELETE) requests
       sessionStorage.setItem("csrfToken", data.csrfToken);
 
       // Show success message before redirect
