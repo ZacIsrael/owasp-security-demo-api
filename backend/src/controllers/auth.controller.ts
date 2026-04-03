@@ -12,6 +12,7 @@ import { UpdateUserDTO } from "../dtos/user.dto";
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
 import {
+  deleteCsrfTokenForUser,
   generateCsrfToken,
   saveCsrfTokenForUser,
 } from "../utils/csrf-token-store";
@@ -89,27 +90,25 @@ export const login = asyncHandler(
 
 // Logs a user out
 export const logout = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    // Ensure user is authenticated before attempting logout
+    if (!req.user) {
+      throw new ErrorResponse("Unauthorized: no authenticated user", 401);
+    }
+
+    // Delete CSRF token for this user to prevent reuse
+    deleteCsrfTokenForUser(req.user.id);
+
     // Clear the auth cookie by overwriting it with an expired value
     res.cookie("token", "none", {
-      // Prevents JavaScript (e.g., document.cookie) from accessing the cookie,
-      // which helps protect against XSS attacks stealing the JWT
       httpOnly: true,
-
-      // Sets the cookie to expire almost immediately (1 second from now),
-      // effectively instructing the browser to delete it
       expires: new Date(Date.now() + 1000),
-
       sameSite: "strict",
-
-      // Specifies that the cookie is valid for the entire application (all routes)
       path: "/",
-
-      // Ensures the cookie is only sent over HTTPS in production environments,
-      // preventing it from being exposed over insecure HTTP connections
       secure: process.env.NODE_ENV === "production",
     });
 
+    // Send success response after logout
     res.status(200).json({
       success: true,
       message: "User logged out successfully",
