@@ -82,6 +82,7 @@ export default function EditMePage() {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": "demo-token"
           },
           body: JSON.stringify({
             email,

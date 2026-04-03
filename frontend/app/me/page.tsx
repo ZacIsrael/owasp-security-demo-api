@@ -63,6 +63,9 @@ export default function MePage() {
       const res = await fetch("http://localhost:8000/api/v1/auth/logout", {
         method: "POST",
         credentials: "include",
+        headers: {
+          "x-csrf-token": "demo-token"
+        }
       });
 
       const data = await res.json();
