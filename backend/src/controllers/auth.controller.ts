@@ -98,38 +98,7 @@ export const logout = asyncHandler(
       // effectively instructing the browser to delete it
       expires: new Date(Date.now() + 1000),
 
-      // The sameSite attribute controls whether the browser is allowed to send
-      // this authentication cookie along with requests that originate from a different site.
-      //
-      // Why this matters:
-      // CSRF (Cross-Site Request Forgery) attacks rely on the fact that a victim is already
-      // logged in and their browser automatically includes the auth cookie in a forged request.
-      //
-      // When sameSite is set to "strict":
-      // - the browser will NOT send this cookie on cross-site requests
-      // - this helps block forged requests coming from a malicious external site
-      // - as a result, the attacker cannot silently perform authenticated actions as the victim
-      //
-      // When sameSite is commented out or omitted for this demo:
-      // - the browser may allow the auth cookie to be sent with cross-site requests
-      // - that means a malicious page could trigger a request to this API while the victim
-      //   is logged in
-      // - the API would receive the victim's valid cookie and may treat the forged request
-      //   as legitimate
-      //
-      // In other words, removing sameSite protection makes it possible to demonstrate
-      // how CSRF works: the attacker does not need to steal the cookie—they only need
-      // the victim's browser to send it automatically.
-
-      // Without sameSite set to "strict", this API becomes vulnerable to CSRF
-
-      // sameSite = "strict" restricts the browser from sending the cookie on 
-      // cross-site requests, providing protection against CSRF attacks
-      /* 
-        Comment out sameSite to showcase CSRF vulnerability, 
-        Un-comment it to show CSRF defense mechanism.
-      */
-      // sameSite: "strict",
+      sameSite: "strict",
 
       // Specifies that the cookie is valid for the entire application (all routes)
       path: "/",

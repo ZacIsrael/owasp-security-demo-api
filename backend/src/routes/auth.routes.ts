@@ -18,13 +18,13 @@ const router = express.Router();
 
 // Register a user
 // Vulnerable
-router.post("/register", register);
-// router.post("/register", validateBody(CreateUserDTO), register);
+// router.post("/register", register);
+router.post("/register", validateBody(CreateUserDTO), register);
 
 // User can login
 // Vulnerable
-router.post("/login", login);
-// router.post("/login", validateBody(LoginUserDTO), login);
+// router.post("/login", login);
+router.post("/login", validateBody(LoginUserDTO), login);
 
 // Log a user out
 router.post("/logout", logout);
