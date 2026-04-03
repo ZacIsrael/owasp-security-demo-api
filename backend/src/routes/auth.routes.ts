@@ -28,7 +28,7 @@ router.post("/register", validateBody(CreateUserDTO), register);
 router.post("/login", validateBody(LoginUserDTO), login);
 
 // Log a user out
-router.post("/logout", logout);
+router.post("/logout", protect, csrfProtection, logout);
 
 // Retrieves the user that's currently logged in
 router.get("/me", protect, getMe);
