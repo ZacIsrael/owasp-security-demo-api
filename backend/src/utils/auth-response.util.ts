@@ -1,38 +1,33 @@
 import type { Response } from "express";
 import type { User } from "../interfaces/user.interface";
 
+// Sends JWT cookie + safe user data + CSRF token in response
 export const sendTokenResponse = (
   user: User,
   token: string,
+  csrfToken: string,
   statusCode: number,
   res: Response
 ): void => {
+  // Get cookie expiration (in days) from env or default to 3 hours (0.125 days)
   const expiresInDays = Number(process.env.JWT_COOKIE_EXPIRES_IN) || 0.125;
 
+  // Configure cookie options for authentication token
   const options = {
+    // Set expiration date for cookie
     expires: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000),
+    // Prevent JavaScript access to cookie (mitigates XSS)
     httpOnly: true,
-    // sameSite controls whether the browser sends this authentication cookie
-    // along with requests that originate from a different site.
-    //
-    // CSRF attacks rely on the browser automatically including the victim’s
-    // authentication cookie in a forged request sent from a malicious site.
-    //
-    // When sameSite is set to "strict":
-    // - the browser will NOT send this cookie on cross-site requests
-    // - this prevents malicious sites from performing authenticated actions
-    //   on behalf of the user
-    //
-    // When sameSite is removed or disabled (as done here for demonstration):
-    // - the browser WILL send the cookie with cross-site requests
-    // - a malicious site can trigger requests to this API while the user is logged in
-    // - the server receives a valid cookie and treats the request as legitimate
-    //
-    // In other words:
-    // removing sameSite protection makes the API susceptible to CSRF attacks
+
+    // Restrict cookie to same-site requests
+    // Removing sameSite protection makes the API susceptible to CSRF attacks
     // because the browser will blindly include the user's auth cookie in forged requests
     sameSite: "strict" as const,
+
+    // Make cookie available across entire app
     path: "/",
+
+    // Only send cookie over HTTPS in production
     secure: process.env.NODE_ENV === "production",
   };
 
@@ -42,8 +37,10 @@ export const sendTokenResponse = (
     password_hash: undefined,
   };
 
+  // Send response with cookie + user data + CSRF token
   res.status(statusCode).cookie("token", token, options).json({
     success: true,
     user: safeUser,
+    csrfToken,
   });
 };

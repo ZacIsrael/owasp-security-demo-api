@@ -2,15 +2,6 @@
 
 import type { Request, Response, NextFunction } from "express";
 
-import type { User } from "../interfaces/user.interface";
-
-import crypto from "crypto";
-
-// Import dotenv to load environment variables from a file
-import dotenv from "dotenv";
-
-// Import Node.js path utilities for resolving file paths
-import path from "node:path";
 import { asyncHandler } from "../middleware/async.middleware";
 import { userService } from "../services/user.service";
 import { ErrorResponse } from "../utils/errorResponse";
@@ -19,6 +10,11 @@ import { generateJwt } from "../utils/auth.util";
 import { sendTokenResponse } from "../utils/auth-response.util";
 import { UpdateUserDTO } from "../dtos/user.dto";
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
+
+import {
+  generateCsrfToken,
+  saveCsrfTokenForUser,
+} from "../utils/csrf-token-store";
 
 export const register = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -80,8 +76,14 @@ export const login = asyncHandler(
     // Client entered valid login credentials so generate jwt token using user id
     const token = generateJwt(user.id);
 
-    // call sendTokenReponse
-    sendTokenResponse(user, token, 200, res);
+    // Generate a CSRF token for this authenticated user
+    const csrfToken = generateCsrfToken();
+
+    // Store the CSRF token server-side for later verification
+    saveCsrfTokenForUser(user.id, csrfToken);
+
+    // Send auth cookie + csrf token to frontend
+    sendTokenResponse(user, token, csrfToken, 200, res);
   }
 );
 
