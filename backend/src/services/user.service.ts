@@ -22,15 +22,15 @@ export const userService = {
 
     // Vulnerable & bad practice: No password hashing
     // Vulnerable to SQL Injection attack
-    const result = await db.query(
-      `INSERT INTO ${usersTable} (email, display_name, password_hash) VALUES ('${dto.email}', '${dto.display_name}', '${hashedPassword}') RETURNING *`
-    );
+    // const result = await db.query(
+    //   `INSERT INTO ${usersTable} (email, display_name, password_hash, bio, role) VALUES ('${dto.email}', '${dto.display_name}', '${hashedPassword}', '${dto.bio}', '${dto.role}') RETURNING *`
+    // );
 
     // Proper way to prevent SQL Injection attack
-    // const result = await db.query(
-    //   `INSERT INTO ${usersTable} (email, display_name, password_hash) VALUES ($1, $2, $3) RETURNING *`,
-    //   [dto.email, dto.display_name, hashedPassword]
-    // );
+    const result = await db.query(
+      `INSERT INTO ${usersTable} (email, display_name, password_hash, bio, role) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [dto.email, dto.display_name, hashedPassword, dto.bio, dto.role]
+    );
 
     // RETURNING * includes the inserted user in the result
     const user = result.rows[0];
@@ -100,7 +100,7 @@ export const userService = {
       // There is no user with the given id
       return null;
     }
-    
+
     // Only allow specific fields to be updated.
     // This protects the query from updating columns that
     // should not be changed or trying to update columns that do not exist.
