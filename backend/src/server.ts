@@ -44,6 +44,20 @@ app.use(
 // and makes the parsed data available on req.body
 app.use(express.json());
 
+// Parses incoming requests with application/x-www-form-urlencoded payloads
+// This is critical for the CSRF demo because malicious HTML forms (like evil.html)
+// do NOT send JSON — they send URL-encoded form data by default.
+//
+// Without this middleware:
+// - req.body will be undefined or invalid for form submissions
+// - the forged CSRF request will fail BEFORE reaching your business logic
+//
+// With this middleware enabled:
+// - the server can correctly parse the attacker's form submission
+// - req.body becomes a valid object (e.g., { display_name, bio })
+// - allowing the CSRF attack to fully succeed when protections (sameSite) are disabled
+app.use(express.urlencoded({ extended: true }));
+
 // Parse cookies from incoming requests
 // Required for reading refresh tokens stored in httpOnly cookies
 app.use(cookieParser());
