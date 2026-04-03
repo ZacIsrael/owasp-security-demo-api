@@ -1,57 +1,52 @@
-/**
- * CSRF Protection Middleware
- *
- * This middleware protects against Cross-Site Request Forgery (CSRF) attacks
- * by enforcing:
- * - Custom header presence on state-changing requests
- * - Validation of request origin (Origin / Referer headers)
- *
- * It ensures that only trusted clients (e.g., frontend app)
- * can perform actions that modify server state when using cookie-based auth.
- */
+// Import types for Express middleware function signature
+import type { NextFunction, Response } from "express";
 
-import type { NextFunction, Request, Response } from "express";
+// Import custom request type that includes authenticated user
+import type { AuthenticatedRequest } from "./auth.middleware";
 
-// HTTP methods that do NOT modify server state (safe from CSRF)
+// Import function to retrieve stored CSRF token for a user
+import { getCsrfTokenForUser } from "../utils/csrf-token-store";
+
+// Define HTTP methods that do NOT modify server state
 const SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
 
-// Allowed frontend origins that are permitted to make requests
+// Define trusted frontend origins allowed to make requests
 const TRUSTED_ORIGINS = ["http://localhost:3000"];
 
+// CSRF protection middleware for state-changing requests
 export const csrfProtection = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
-  // Skip CSRF protection for safe/read-only requests
+  // Skip CSRF checks for safe (read-only) requests
   if (SAFE_METHODS.includes(req.method)) {
     return next();
   }
 
-  // Extract Fetch Metadata header that indicates the context of the request
+  // Extract Fetch Metadata header to determine request origin context
   const fetchSite = req.header("sec-fetch-site");
 
-  // Block cross-site requests for state-changing operations
-  if (
-    // Only enforce for non-safe (mutating) HTTP methods
-    !SAFE_METHODS.includes(req.method) &&
-    // Ensure the header exists (modern browsers only)
-    fetchSite &&
-    // Allow same-origin and same-site requests only
-    fetchSite !== "same-origin" &&
-    fetchSite !== "same-site"
-  ) {
+  // Block requests coming from cross-site contexts
+  if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "same-site") {
     return res.status(403).json({
       success: false,
       error: "CSRF protection: cross-site request blocked",
     });
   }
 
-  // Require a custom header to ensure request is intentionally made by frontend
-  // All frontend requests MUST include the "x-csrf-token" header or they will be rejected
+  // Ensure request is authenticated (protect middleware in routes should run first)
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized: no authenticated user",
+    });
+  }
+
+  // Extract CSRF token from custom request header
   const csrfHeader = req.header("x-csrf-token");
 
-  // Reject request if custom CSRF header is missing
+  // Reject request if CSRF header is missing
   if (!csrfHeader) {
     return res.status(403).json({
       success: false,
@@ -59,10 +54,29 @@ export const csrfProtection = (
     });
   }
 
-  // Extract the Origin header (sent by browsers for cross-origin requests)
+  // Retrieve expected CSRF token for authenticated user
+  const expectedToken = getCsrfTokenForUser(req.user.id);
+
+  // Reject request if no token exists server-side
+  if (!expectedToken) {
+    return res.status(403).json({
+      success: false,
+      error: "CSRF protection: no server-side CSRF token found",
+    });
+  }
+
+  // Reject request if provided token does not match expected token
+  if (csrfHeader !== expectedToken) {
+    return res.status(403).json({
+      success: false,
+      error: "CSRF protection: invalid CSRF token",
+    });
+  }
+
+  // Extract Origin header to validate request source
   const origin = req.header("origin");
 
-  // Reject request if Origin exists but is not trusted
+  // Reject request if origin is present but not trusted
   if (origin && !TRUSTED_ORIGINS.includes(origin)) {
     return res.status(403).json({
       success: false,
@@ -70,10 +84,10 @@ export const csrfProtection = (
     });
   }
 
-  // Extract Referer header as fallback when Origin is not provided
+  // Extract Referer header as fallback when Origin is missing
   const referer = req.header("referer");
 
-  // If Origin is missing, validate Referer against trusted origins
+  // Validate Referer against trusted origins if Origin is not present
   if (!origin && referer) {
     const isTrustedReferer = TRUSTED_ORIGINS.some((trustedOrigin) =>
       referer.startsWith(trustedOrigin)
@@ -88,6 +102,6 @@ export const csrfProtection = (
     }
   }
 
-  // All CSRF checks passed; allow request to proceed
+  // All CSRF checks passed — allow request to proceed
   next();
 };
