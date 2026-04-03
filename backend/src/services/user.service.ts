@@ -20,6 +20,9 @@ export const userService = {
     // Proper way: hash password
     const hashedPassword = await hashPassword(dto.password);
 
+    // debugging
+    console.log('dto = ', dto);
+
     // Vulnerable & bad practice: No password hashing
     // Vulnerable to SQL Injection attack
     // const result = await db.query(
@@ -44,15 +47,15 @@ export const userService = {
   async getUserByEmail(email: string): Promise<{ user: User | null }> {
     // Vulnerable & bad practice: No password hashing
     // Vulnerable to SQL Injection attack
-    const result = await db.query(
-      `SELECT * FROM ${usersTable} WHERE email = '${email}'`
-    );
+    // const result = await db.query(
+    //   `SELECT * FROM ${usersTable} WHERE email = '${email}'`
+    // );
 
     // Proper way to prevent SQL Injection attack
-    // const result = await db.query(
-    //   `SELECT * FROM ${usersTable} WHERE email = ($1)`,
-    //   [email]
-    // );
+    const result = await db.query(
+      `SELECT * FROM ${usersTable} WHERE email = ($1)`,
+      [email]
+    );
 
     // Schema enforces unique emails so no need to check if
     // there is more than 1 user with the same email.
@@ -67,14 +70,14 @@ export const userService = {
   // Retrieve a user by its id
   async getUserById(id: string): Promise<{ user: User | null }> {
     // vulnerable way
-    const result = await db.query(
-      `SELECT * FROM users WHERE id = '${id}' LIMIT 1`
-    );
+    // const result = await db.query(
+    //   `SELECT * FROM users WHERE id = '${id}' LIMIT 1`
+    // );
 
     // Proper way
-    // const result = await db.query(`SELECT * FROM users WHERE id = $1 LIMIT 1`, [
-    //   id,
-    // ]);
+    const result = await db.query(`SELECT * FROM users WHERE id = $1 LIMIT 1`, [
+      id,
+    ]);
 
     const user: User | null = result.rows[0] || null;
 
