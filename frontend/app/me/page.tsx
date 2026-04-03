@@ -55,31 +55,62 @@ export default function MePage() {
     loadUser();
   }, [router]);
 
+  // Handle user logout and invalidate session
   const handleLogout = async () => {
+    // Show loading message while logout request is in progress
     setMessage("Logging out...");
+
+    // Reset error state before attempting logout
     setIsError(false);
 
     try {
+      // Retrieve stored CSRF token from session storage
+      const csrfToken = sessionStorage.getItem("csrfToken");
+
+      // Ensure CSRF token exists before making request
+      if (!csrfToken) {
+        setMessage("CSRF token missing. Please log in again.");
+        setIsError(true);
+        return;
+      }
+
+      // Send POST request to logout endpoint
       const res = await fetch("http://localhost:8000/api/v1/auth/logout", {
+        // Use POST method for logout action
         method: "POST",
+
+        // Include authentication cookie (JWT)
         credentials: "include",
+
+        // Attach CSRF token header for verification
         headers: {
-          "x-csrf-token": "demo-token"
-        }
+          "x-csrf-token": csrfToken,
+        },
       });
 
+      // Parse JSON response from backend
       const data = await res.json();
 
+      // Handle failed logout attempt
       if (!res.ok) {
         setMessage(data?.error || "Logout failed.");
         setIsError(true);
         return;
       }
 
+      // Remove CSRF token from session storage after logout
+      sessionStorage.removeItem("csrfToken");
+
+      // Redirect user to login page after successful logout
       router.push("/login");
     } catch (error) {
+      // Handle network or unexpected errors
       console.error(error);
+
+      // Show error message to user
       setMessage("Request failed while logging out.");
+
+      // Set error state for UI feedback
       setIsError(true);
     }
   };

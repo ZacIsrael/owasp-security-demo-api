@@ -68,22 +68,45 @@ export default function EditMePage() {
     loadUser();
   }, [router]);
 
+  // Handle profile update form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    // Prevent default form submission behavior (page reload)
     e.preventDefault();
+
+    // Set submitting state and show loading message
     setIsSubmitting(true);
     setMessage("Updating profile...");
     setIsError(false);
 
     try {
+      // Retrieve stored CSRF token from session storage
+      const csrfToken = sessionStorage.getItem("csrfToken");
+
+      // Ensure CSRF token exists before making request
+      if (!csrfToken) {
+        setMessage("CSRF token missing. Please log in again.");
+        setIsError(true);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Send PATCH request to update user profile
       const res = await fetch(
         "http://localhost:8000/api/v1/auth/updatedetails",
         {
+          // Use PATCH method for partial updates
           method: "PATCH",
+
+          // Include authentication cookie (JWT)
           credentials: "include",
+
+          // Set headers including CSRF token for protection
           headers: {
             "Content-Type": "application/json",
-            "x-csrf-token": "demo-token"
+            "x-csrf-token": csrfToken,
           },
+
+          // Send updated user fields in request body
           body: JSON.stringify({
             email,
             display_name: displayName,
@@ -92,8 +115,10 @@ export default function EditMePage() {
         }
       );
 
+      // Parse JSON response from backend
       const data = await res.json();
 
+      // Handle failed update request
       if (!res.ok) {
         setMessage(data?.error || "Failed to update profile.");
         setIsError(true);
@@ -101,13 +126,16 @@ export default function EditMePage() {
         return;
       }
 
+      // Show success message after successful update
       setMessage("Profile updated successfully.");
       setIsError(false);
 
+      // Redirect user back to profile page after short delay
       setTimeout(() => {
         router.push("/me");
       }, 1000);
     } catch (error) {
+      // Handle network or unexpected errors
       console.error(error);
       setMessage("Request failed while updating profile.");
       setIsError(true);
