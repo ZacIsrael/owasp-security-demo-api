@@ -98,10 +98,19 @@ export class CreateUserDTO {
     this.password = password;
 
     if (bio !== undefined) {
-      if (!isNonEmptyString(bio)) {
-        throw new Error("bio must be a non-empty string when provided");
+      // The frontend sends bio in body of the request regardless if it's 
+      // empty or not so it'll never be undefined.
+      // Empty strings are valid for bios
+      // if (!isNonEmptyString(bio)) {
+      //   throw new Error("bio must be a non-empty string when provided");
+      // }
+
+      // Ensure the the bio is a string
+      if (typeof bio !== "string"){
+        throw new Error("bio must be a string when provided");
       }
 
+      // remove any possible malicious text
       const sanitizedBio = sanitizePlainText(bio.trim());
 
       if (sanitizedBio.length > 500) {
