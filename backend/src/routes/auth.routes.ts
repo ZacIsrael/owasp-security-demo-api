@@ -40,6 +40,9 @@ router.patch(
   updateDetails
 );
 
+// Temporary route to showcase CSRF vulnerability
+router.post("/updatedetails-demo", protect, updateDetails);
+
 // vulnerable
 /*
 router.patch(
