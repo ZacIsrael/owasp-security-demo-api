@@ -13,6 +13,7 @@ import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
 
 import { validateBody } from "../middleware/validate.middleware";
 import { protect } from "../middleware/auth.middleware";
+import { csrfProtection } from "../middleware/csrf.middleware";
 
 const router = express.Router();
 
@@ -36,12 +37,19 @@ router.get("/me", protect, getMe);
 router.patch(
   "/updatedetails",
   protect,
+  csrfProtection,
   validateBody(UpdateUserDTO),
   updateDetails
 );
 
 // Temporary route to showcase CSRF vulnerability
-router.post("/updatedetails-demo", protect, updateDetails);
+router.post(
+  "/updatedetails-demo",
+  protect,
+  // add csrf protection
+  csrfProtection,
+  updateDetails
+);
 
 // vulnerable
 /*

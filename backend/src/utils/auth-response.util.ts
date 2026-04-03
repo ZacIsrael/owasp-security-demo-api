@@ -31,7 +31,7 @@ export const sendTokenResponse = (
     // In other words:
     // removing sameSite protection makes the API susceptible to CSRF attacks
     // because the browser will blindly include the user's auth cookie in forged requests
-    // sameSite: "strict" as const,
+    sameSite: "strict" as const,
     path: "/",
     secure: process.env.NODE_ENV === "production",
   };
