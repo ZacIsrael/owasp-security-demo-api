@@ -139,11 +139,26 @@ export default function MePage() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+              {/* Safe render; avoid XSS */}
+              {/* <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
                 <p className="text-sm font-medium text-gray-500">Bio</p>
                 <p className="mt-1 text-base text-gray-900">
                   {user.bio || "N/A"}
                 </p>
+              </div> */}
+
+              {/* Vulnerable to XSS; un-safe rendering */}
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+                <p className="text-sm font-medium text-gray-500">Bio</p>
+
+                {!user.bio ? (
+                  <p className="mt-1 text-base text-gray-900">N/A</p>
+                ) : (
+                  <div
+                    className="mt-1 text-base text-gray-900"
+                    dangerouslySetInnerHTML={{ __html: user.bio }}
+                  />
+                )}
               </div>
             </div>
 
