@@ -272,16 +272,26 @@ export default function UserProfilePage() {
           <div className="mt-6 rounded-xl border border-gray-200 bg-white px-4 py-4">
             <p className="text-sm font-medium text-gray-500">Bio</p>
 
-            <p className="mt-1 text-base text-gray-900">{user?.bio || "N/A"}</p>
+            {/* <p className="mt-1 text-base text-gray-900">{user?.bio || "N/A"}</p> */}
 
-            {/*
-            // Vulnerable render for XSS demo only:
-            // This directly injects stored HTML into the DOM and can execute malicious script payloads.
+            {/* Vulnerable render for XSS demo only:
+             This directly injects stored HTML into the DOM and can execute malicious script payloads. */}
             <div
               className="mt-1 text-base text-gray-900"
+              // Using dangerouslySetInnerHTML bypasses React's default HTML escaping,
+              // allowing raw HTML injection into the DOM (potential XSS risk).
+              // Only use it when content is:
+              // 1) Trusted, or
+              // 2) Strictly sanitized on the backend
+              //
+              // Common valid use cases:
+              // - CMS-rendered content (e.g., blog posts)
+              // - Markdown converted to HTML
+              // - Rich text editors (Quill, TinyMCE)
+              //
+              // Never use with unsanitized user input.
               dangerouslySetInnerHTML={{ __html: user?.bio || "N/A" }}
             />
-            */}
           </div>
 
           <div className="mt-6">
