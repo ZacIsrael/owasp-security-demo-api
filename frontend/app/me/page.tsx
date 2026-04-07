@@ -171,15 +171,17 @@ export default function MePage() {
               </div>
 
               {/* Safe render; avoid XSS */}
-              {/* <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+              {/* React automatically escapes user input when rendering with JSX,
+              so any HTML/JS in user.bio is treated as text (preventing XSS). */}
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
                 <p className="text-sm font-medium text-gray-500">Bio</p>
                 <p className="mt-1 text-base text-gray-900">
                   {user.bio || "N/A"}
                 </p>
-              </div> */}
-
+              </div>
+              
               {/* Vulnerable to XSS; un-safe rendering */}
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+              {/* <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
                 <p className="text-sm font-medium text-gray-500">Bio</p>
 
                 {!user.bio ? (
@@ -202,7 +204,7 @@ export default function MePage() {
                     dangerouslySetInnerHTML={{ __html: user.bio }}
                   />
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
