@@ -2,7 +2,11 @@
 import { db } from "../database/postgres/connection";
 
 // Structure of a User object
-import { CreateUserInterface, User } from "../interfaces/user.interface";
+import {
+  CreateUserInterface,
+  PublicUserInterface,
+  User,
+} from "../interfaces/user.interface";
 import { UpdateUserBody } from "../types/user.types";
 import { hashPassword } from "../utils/helpers";
 
@@ -82,6 +86,27 @@ export const userService = {
     const user: User | null = result.rows[0] || null;
 
     return { user };
+  },
+
+  // Public-facing version of getUserById used for user browsing endpoints (e.g., /users/:id).
+  // This exists separately to ensure sensitive fields (like password_hash) are never selected or exposed.
+  async getPublicUserById(id: string): Promise<PublicUserInterface | null> {
+    // Execute a parameterized SQL query to safely fetch a single user by ID
+    const result = await db.query<PublicUserInterface>(
+      // Select only public-safe fields to prevent leaking sensitive data
+      `
+        SELECT id, email, display_name, bio, created_at
+        FROM ${usersTable}
+        WHERE id = $1
+        LIMIT 1
+      `,
+
+      // Pass the user ID as a parameter to prevent SQL injection
+      [id]
+    );
+
+    // Return the first matching user if found, otherwise return null
+    return result.rows[0] ?? null;
   },
 
   // Update a user with a given id
