@@ -224,15 +224,16 @@ export class UpdateUserDTO {
     }
 
     if (bio !== undefined) {
-      if (!isNonEmptyString(bio)) {
-        throw new Error("bio must be a non-empty string when provided");
+      // A user can update their bio to be an empty string if they'd like
+      // so there's no need to check if bio is empty
+      if (typeof bio !== "string") {
+        throw new Error("bio must be a string when provided");
       }
-
       // Defense against XSS
-      // const sanitizedBio = sanitizePlainText(bio.trim());
+      const sanitizedBio = sanitizePlainText(bio.trim());
 
       // Vulnerable to XSS attacks: unsaniztized user input
-      const sanitizedBio = bio.trim();
+      // const sanitizedBio = bio.trim();
 
       if (sanitizedBio.length > 500) {
         throw new Error("Bio can't exceed 500 characters");
