@@ -86,66 +86,6 @@ export default function MePage() {
     // Dependency ensures router is available for redirects
   }, [router]);
 
-  // Handle user logout and invalidate session
-  const handleLogout = async () => {
-    // Show loading message while logout request is in progress
-    setMessage("Logging out...");
-
-    // Reset error state before attempting logout
-    setIsError(false);
-
-    try {
-      // Retrieve stored CSRF token from session storage
-      const csrfToken = sessionStorage.getItem("csrfToken");
-
-      // Ensure CSRF token exists before making request
-      if (!csrfToken) {
-        setMessage("CSRF token missing. Please log in again.");
-        setIsError(true);
-        return;
-      }
-
-      // Send POST request to logout endpoint
-      const res = await fetch("http://localhost:8000/api/v1/auth/logout", {
-        // Use POST method for logout action
-        method: "POST",
-
-        // Include authentication cookie (JWT)
-        credentials: "include",
-
-        // Attach CSRF token header for verification
-        headers: {
-          "x-csrf-token": csrfToken,
-        },
-      });
-
-      // Parse JSON response from backend
-      const data = await res.json();
-
-      // Handle failed logout attempt
-      if (!res.ok) {
-        setMessage(data?.error || "Logout failed.");
-        setIsError(true);
-        return;
-      }
-
-      // Remove CSRF token from session storage after logout
-      sessionStorage.removeItem("csrfToken");
-
-      // Redirect user to login page after successful logout
-      router.push("/login");
-    } catch (error) {
-      // Handle network or unexpected errors
-      console.error(error);
-
-      // Show error message to user
-      setMessage("Request failed while logging out.");
-
-      // Set error state for UI feedback
-      setIsError(true);
-    }
-  };
-
   return (
     <PageContainer>
       <Card
@@ -179,7 +119,7 @@ export default function MePage() {
                   {user.bio || "N/A"}
                 </p>
               </div>
-              
+
               {/* Vulnerable to XSS; un-safe rendering */}
               {/* <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
                 <p className="text-sm font-medium text-gray-500">Bio</p>
@@ -214,15 +154,6 @@ export default function MePage() {
                 onClick={() => router.push("/me/edit")}
               >
                 Edit Details
-              </Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                fullWidth
-                onClick={handleLogout}
-              >
-                Log Out
               </Button>
             </div>
           </div>
