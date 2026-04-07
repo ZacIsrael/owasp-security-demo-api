@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 
 // import routes
 import authRouter from "./routes/auth.routes";
+import usersRouter from "./routes/users.routes";
 
 // Loads environment variables from a `.env` file into process.env
 // Used for storing sensitive data like database credentials, API keys, etc.
@@ -67,6 +68,7 @@ const API_VERSION = 1;
 
 // import routes
 app.use(`/api/v${API_VERSION}/auth`, authRouter);
+app.use(`/api/v${API_VERSION}/users`, usersRouter);
 
 app.use(errorHandler);
 
