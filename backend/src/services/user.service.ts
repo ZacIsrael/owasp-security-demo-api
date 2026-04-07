@@ -21,7 +21,7 @@ export const userService = {
     const hashedPassword = await hashPassword(dto.password);
 
     // debugging
-    console.log('dto = ', dto);
+    console.log("dto = ", dto);
 
     // Vulnerable & bad practice: No password hashing
     // Vulnerable to SQL Injection attack
@@ -169,5 +169,23 @@ export const userService = {
     // return the updated row.
     const updatedUser: User | null = updatedUserResult.rows[0] || null;
     return updatedUser;
+  },
+
+  // Fetch all users with only public-safe fields
+  async getAllUsers(): Promise<User[]> {
+    // Explicitly select only safe, public-facing fields
+    const result = await db.query<User>(`
+    SELECT 
+      id,
+      email,
+      display_name,
+      bio,
+      created_at
+    FROM ${usersTable}
+    ORDER BY created_at DESC
+  `);
+
+    // Return the rows directly (already typed as User[])
+    return result.rows;
   },
 };
