@@ -1,5 +1,5 @@
-import { assertIsObject } from "../utils/helpers.js";
-import { isValidUUID, rejectUnknownFields } from "../utils/validation.js";
+import { assertIsObject } from "../utils/helpers";
+import { isValidUUID, rejectUnknownFields } from "../utils/validation";
 
 // Generic :id validator (for POstgreSQL)
 // For routes like /users/:id
