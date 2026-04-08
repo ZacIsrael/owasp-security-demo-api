@@ -262,12 +262,15 @@ export default function UserProfilePage() {
             </p>
           </div>
 
-          <div className="mt-6">
+            {/* Users viewing a user's profile do NOT need to see that user's email 
+            Note to self: Think about it, X nor TikTok share your email with 
+            people that view your page or follow you. lol */}
+          {/* <div className="mt-6">
             <p className="text-sm font-medium text-gray-500">Email</p>
             <p className="mt-1 text-base text-gray-900">
               {user?.email || "N/A"}
             </p>
-          </div>
+          </div> */}
 
           <div className="mt-6 rounded-xl border border-gray-200 bg-white px-4 py-4">
             <p className="text-sm font-medium text-gray-500">Bio</p>
