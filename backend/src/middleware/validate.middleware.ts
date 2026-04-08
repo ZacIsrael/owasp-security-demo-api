@@ -148,10 +148,10 @@ export const validateBody =
  * Middleware to validate route parameters (req.params).
  *
  * Example:
- *   /bootcamps/:id → validates "id"
+ *   /users/:id → validates "id"
  *
  * Important for:
- *   - Mongo ObjectId validation
+ *   - PostgreSQL id validation
  *   - Preventing malformed route access
  */
 export const validateParams =
