@@ -293,15 +293,6 @@ export default function UserProfilePage() {
               dangerouslySetInnerHTML={{ __html: user?.bio || "N/A" }}
             />
           </div>
-
-          <div className="mt-6">
-            <p className="text-sm font-medium text-gray-500">Created At</p>
-            <p className="mt-1 text-base text-gray-900">
-              {user?.created_at
-                ? new Date(user.created_at).toLocaleString()
-                : "N/A"}
-            </p>
-          </div>
         </div>
       </section>
     </main>
