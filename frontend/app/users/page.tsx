@@ -218,13 +218,17 @@ export default function UsersPage() {
                     {user.display_name}
                   </h2>
 
-                  {/* Show the user's email for demo realism */}
-                  <p className="mt-1 text-sm text-gray-600">{user.email}</p>
+                  {/* Real social media apps do not share a user's email unless the user 
+                  explicityly tells them to do so (i.e. contact button on instagram) */}
+                  {/* <p className="mt-1 text-sm text-gray-600">{user.email}</p> */}
 
-                  {/* Show a short bio preview in the list page */}
-                  <p className="mt-3 text-sm text-gray-800">
+                  {/* No need to show the bio here; Real social media app do not do this.
+                  The post they'd show is the username and display name. Also, leaving this 
+                  out works better for the demo because the victim user can't see the attacker's
+                  bio that contains malicious javascript before they click it */}
+                  {/* <p className="mt-3 text-sm text-gray-800">
                     {user.bio?.trim() ? user.bio : "No bio provided."}
-                  </p>
+                  </p> */}
                 </div>
 
                 {/* Route authenticated users to /me when clicking their own profile */}
