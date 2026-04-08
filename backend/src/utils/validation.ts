@@ -121,12 +121,6 @@ export const isValidPassword = (value: unknown): value is string => {
 };
 
 // Validates whether a value is a valid MongoDB ObjectId.
-// Important for route params like:
-// - /bootcamps/:id
-// - /courses/:id
-// - /reviews/:id
-// - /users/:id
-
 export const isValidMongoObjectId = (value: unknown): value is string => {
   return typeof value === "string" && mongoose.Types.ObjectId.isValid(value);
 };
