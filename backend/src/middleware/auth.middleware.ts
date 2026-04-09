@@ -71,7 +71,7 @@ export const protect = asyncHandler(
 
       // Query PostgreSQL for the authenticated user
       const result = await db.query(
-        `SELECT id, email, password_hash, display_name, bio, role, is_active, created_at, updated_at
+        `SELECT id, role, is_active
          FROM users
          WHERE id = $1
          LIMIT 1`,
@@ -96,7 +96,7 @@ export const protect = asyncHandler(
         });
       }
 
-      // Remove sensitive fields (in this case, password_hash is the only 
+      // Remove sensitive fields (in this case, password_hash is the only
       // sensitive field) before attaching user to request
       const { password_hash, ...safeUser } = user;
 
