@@ -99,10 +99,10 @@ export const logout = asyncHandler(
     // Delete CSRF token for this user to prevent reuse
     deleteCsrfTokenForUser(req.user.id);
 
-    // Clear the auth cookie by overwriting it with an expired value
-    res.cookie("token", "none", {
+    // Properly clears the auth cookie by instructing the browser to remove it
+    // (prevents stale or invalid JWT values from being sent on subsequent requests)
+    res.clearCookie("token", {
       httpOnly: true,
-      expires: new Date(Date.now() + 1000),
       sameSite: "strict",
       path: "/",
       secure: process.env.NODE_ENV === "production",
