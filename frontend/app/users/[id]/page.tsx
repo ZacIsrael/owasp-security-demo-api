@@ -262,7 +262,7 @@ export default function UserProfilePage() {
             </p>
           </div>
 
-            {/* Users viewing a user's profile do NOT need to see that user's email 
+          {/* Users viewing a user's profile do NOT need to see that user's email 
             Note to self: Think about it, X nor TikTok share your email with 
             people that view your page or follow you. lol */}
           {/* <div className="mt-6">
@@ -275,11 +275,11 @@ export default function UserProfilePage() {
           <div className="mt-6 rounded-xl border border-gray-200 bg-white px-4 py-4">
             <p className="text-sm font-medium text-gray-500">Bio</p>
 
-            {/* <p className="mt-1 text-base text-gray-900">{user?.bio || "N/A"}</p> */}
+            <p className="mt-1 text-base text-gray-900">{user?.bio || "N/A"}</p>
 
             {/* Vulnerable render for XSS demo only:
              This directly injects stored HTML into the DOM and can execute malicious script payloads. */}
-            <div
+            {/* <div
               className="mt-1 text-base text-gray-900"
               // Using dangerouslySetInnerHTML bypasses React's default HTML escaping,
               // allowing raw HTML injection into the DOM (potential XSS risk).
@@ -294,7 +294,7 @@ export default function UserProfilePage() {
               //
               // Never use with unsanitized user input.
               dangerouslySetInnerHTML={{ __html: user?.bio || "N/A" }}
-            />
+            /> */}
           </div>
         </div>
       </section>
