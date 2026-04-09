@@ -36,12 +36,12 @@ export const protect = asyncHandler(
     let token: string | undefined;
 
     // Only accept token from HTTP-only cookie
-    if (req.cookies?.token) {
-      token = req.cookies.token;
+    if (typeof req.cookies?.token === "string") {
+      token = req.cookies.token.trim();
     }
 
     // If no token is found, deny access
-    if (!token) {
+    if (!token || token === "none") {
       return res.status(401).json({
         success: false,
         error: "Not authorized to access this route",
