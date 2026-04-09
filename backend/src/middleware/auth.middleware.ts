@@ -16,18 +16,20 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-// Safe version of the User type by excluding sensitive fields (e.g., password_hash)
-// so that confidential data is not propagated through the request object
-type SafeUser = Omit<User, "password_hash">;
+// Defines a minimal user shape for authentication/authorization context,
+// including only fields required for access control (avoids exposing sensitive/unnecessary data)
+export type AuthContextUser = Pick<User, "id" | "role" | "is_active">;
 
 // Extend Express Request so req.user is properly typed
 export interface AuthenticatedRequest extends Request {
-  user?: SafeUser;
+  user?: AuthContextUser;
+  sessionId?: string;
 }
 
-// JWT payload shape expected from the app
+// JWT payload shape expected from the app (user id AND session id)
 interface JwtPayload {
   id: string;
+  jti: string;
 }
 
 // Middleware to protect routes by requiring a valid JWT
@@ -57,17 +59,20 @@ export const protect = asyncHandler(
       // Verify token and decode payload
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Make sure the token payload contains a valid user id
+      // Make sure the token payload contains a valid user id AND session id
       if (
         typeof decoded !== "object" ||
         decoded === null ||
         !("id" in decoded) ||
-        typeof decoded.id !== "string"
+        typeof decoded.id !== "string" ||
+        !("jti" in decoded) ||
+        typeof decoded.jti !== "string"
       ) {
         throw new Error("Invalid token payload");
       }
 
-      const { id } = decoded as JwtPayload;
+      // extract user id and session id
+      const { id, jti } = decoded as JwtPayload;
 
       // Query PostgreSQL for the authenticated user
       const result = await db.query(
@@ -78,7 +83,9 @@ export const protect = asyncHandler(
         [id]
       );
 
-      const user: User | undefined = result.rows[0];
+      // Extract the authenticated user's minimal auth context from the query result
+      // (only id, role, and is_active are selected to enforce least privilege)
+      const user: AuthContextUser | undefined = result.rows[0];
 
       // If no user is found, deny access
       if (!user) {
@@ -96,12 +103,11 @@ export const protect = asyncHandler(
         });
       }
 
-      // Remove sensitive fields (in this case, password_hash is the only
-      // sensitive field) before attaching user to request
-      const { password_hash, ...safeUser } = user;
-
       // Attach authenticated user row to request object
-      req.user = safeUser;
+      req.user = user;
+
+      // Attach session id to the request object
+      req.sessionId = jti;
 
       // Continue to next middleware/route handler
       next();

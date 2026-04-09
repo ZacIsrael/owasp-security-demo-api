@@ -12,9 +12,9 @@ import { UpdateUserDTO } from "../dtos/user.dto";
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
 import {
-  deleteCsrfTokenForUser,
+  deleteCsrfTokenForSession,
   generateCsrfToken,
-  saveCsrfTokenForUser,
+  saveCsrfTokenForSession,
 } from "../utils/csrf-token-store";
 
 export const register = asyncHandler(
@@ -74,14 +74,14 @@ export const login = asyncHandler(
       throw new ErrorResponse("Invalid credentials", 401);
     }
 
-    // Client entered valid login credentials so generate jwt token using user id
-    const token = generateJwt(user.id);
+    // Client entered valid login credentials so generate jwt token and session using user id
+    const { token, sessionId } = generateJwt(user.id);
 
-    // Generate a CSRF token for this authenticated user
+    // Generate a CSRF token for this authenticated user's session
     const csrfToken = generateCsrfToken();
 
-    // Store the CSRF token server-side for later verification
-    saveCsrfTokenForUser(user.id, csrfToken);
+    // Store CSRF token server-side by session (not user)
+    saveCsrfTokenForSession(sessionId, csrfToken);
 
     // Send auth cookie + csrf token to frontend
     sendTokenResponse(user, token, csrfToken, 200, res);
@@ -96,8 +96,10 @@ export const logout = asyncHandler(
       throw new ErrorResponse("Unauthorized: no authenticated user", 401);
     }
 
-    // Delete CSRF token for this user to prevent reuse
-    deleteCsrfTokenForUser(req.user.id);
+    // Delete CSRF token for this session to prevent reuse
+    if (req.sessionId) {
+      deleteCsrfTokenForSession(req.sessionId);
+    }
 
     // Properly clears the auth cookie by instructing the browser to remove it
     // (prevents stale or invalid JWT values from being sent on subsequent requests)

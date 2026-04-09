@@ -4,8 +4,8 @@ import type { NextFunction, Response } from "express";
 // Import custom request type that includes authenticated user
 import type { AuthenticatedRequest } from "./auth.middleware";
 
-// Import function to retrieve stored CSRF token for a user
-import { getCsrfTokenForUser } from "../utils/csrf-token-store";
+// Import function to retrieve stored CSRF token for a session
+import { getCsrfTokenForSession } from "../utils/csrf-token-store";
 
 // Define HTTP methods that do NOT modify server state
 const SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
@@ -35,12 +35,20 @@ export const csrfProtection = (
     });
   }
 
-  // Ensure request is authenticated (protect middleware in routes should run first
-  // but if for some reason it does not, catch the error)
+  // Ensure request is authenticated (protect middleware in routes 
+  // should run first but if for some reason it does not, catch the error)
   if (!req.user) {
     return res.status(401).json({
       success: false,
       error: "Unauthorized: no authenticated user",
+    });
+  }
+
+  // check that a valid session id exists
+  if (!req.sessionId) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized: no session identifier",
     });
   }
 
@@ -55,8 +63,8 @@ export const csrfProtection = (
     });
   }
 
-  // Retrieve expected CSRF token for authenticated user
-  const expectedToken = getCsrfTokenForUser(req.user.id);
+  // Retrieve expected CSRF token for authenticated session
+  const expectedToken = getCsrfTokenForSession(req.sessionId);
 
   // Reject request if no token exists server-side
   if (!expectedToken) {
