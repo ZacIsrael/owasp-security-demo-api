@@ -16,7 +16,9 @@ export const sendTokenResponse = (
   const options = {
     // Set expiration date for cookie (3 hours from the current moment in time)
     expires: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000),
-    // Prevent JavaScript access to cookie (mitigates XSS)
+    
+    // Marks the authentication cookie as inaccessible to client-side JavaScript,
+    // so injected scripts cannot read or steal the session token via document.cookie.
     httpOnly: true,
 
     // Restrict cookie to same-site requests
