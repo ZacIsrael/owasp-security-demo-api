@@ -11,11 +11,19 @@ import Button from "@/components/ui/button";
 import Alert from "@/components/ui/alert";
 
 export default function LoginPage() {
+  // Next.js router for client-side navigation after successful login
   const router = useRouter();
 
+  // Stores the user's email input value
   const [email, setEmail] = useState("");
+
+  // Stores the user's password input value
   const [password, setPassword] = useState("");
+
+  // Stores status/error/success messages displayed to the user
   const [message, setMessage] = useState("");
+
+  // Tracks whether the current message represents an error state
   const [isError, setIsError] = useState(false);
 
   // Handle login form submission and authenticate user
@@ -77,7 +85,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Store CSRF token in session storage for 
+      // Store CSRF token in session storage for
       // future state-changing (POST, PATCH, PUT, DELETE) requests
       sessionStorage.setItem("csrfToken", data.csrfToken);
 
