@@ -13,7 +13,7 @@ const cspHeader = `
   base-uri 'self';
   frame-ancestors 'none';
   form-action 'self';
-  frame-src *;
+  frame-src 'self';
 `
   .replace(/\s{2,}/g, " ")
   .trim();
