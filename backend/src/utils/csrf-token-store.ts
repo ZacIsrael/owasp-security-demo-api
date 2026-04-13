@@ -1,5 +1,5 @@
 //   CSRF token store for synchronizer token pattern.
-//   Generates and manages tokens tied to authenticated users.
+// Generates and manages CSRF tokens tied to authenticated sessions.
 //   Used to verify that state-changing requests are intentional.
 //   In-memory only (for the purpose of the demonstration; not production-safe).
 
@@ -17,19 +17,16 @@ import crypto from "crypto";
 const csrfTokenStore = new Map<string, string>();
 
 // Generates a cryptographically secure random CSRF token.
-// Tokens must be unpredictable to prevent attackers from guessing them
-// crypto module used for strong randomness
+// Tokens must be unpredictable to prevent attackers from guessing them.
+// Node.js crypto module used for strong randomness
 export const generateCsrfToken = (): string => {
   // returns a hex-encoded string representing the CSRF token
   return crypto.randomBytes(32).toString("hex");
 };
 
 // Stores a CSRF token for a specific authenticated session.
-// sessionId - The authenticated session identifier (for example, a JWT jti)
+// sessionId - The authenticated session identifier
 // token - The CSRF token generated for that session
-// This function:
-// - Associates the token with the session in memory
-// - Overwrites any existing token for that same session
 export const saveCsrfTokenForSession = (
   sessionId: string,
   token: string
@@ -48,10 +45,8 @@ export const getCsrfTokenForSession = (
 
 // Deletes the CSRF token for a specific authenticated session.
 // sessionId - The authenticated session identifier
-// This function is needed because it:
-// - Prevents reuse of old tokens after logout
-// - Helps reduce attack surface if a token is compromised
-// Used during logout flow.
+// This function is needed because it helps prevent old session
+// tokens from remaining usable after logout or session invalidation.
 export const deleteCsrfTokenForSession = (sessionId: string): void => {
   csrfTokenStore.delete(sessionId);
 };
