@@ -11,20 +11,42 @@ import Button from "@/components/ui/button";
 import Alert from "@/components/ui/alert";
 
 export default function RegisterPage() {
+  // Next.js router for client-side navigation after successful registration
   const router = useRouter();
 
+  // Stores the user's email input value
   const [email, setEmail] = useState("");
+
+  // Stores the user's password input value
   const [password, setPassword] = useState("");
+
+  // Stores the user's chosen display name
   const [displayName, setDisplayName] = useState("");
+
+  // Stores the user's bio input text
   const [bio, setBio] = useState("");
+
+  // Stores status/error/success messages displayed to the user
   const [message, setMessage] = useState("");
+
+  // Tracks whether the current message represents an error state
   const [isError, setIsError] = useState(false);
+
+  // Tracks whether the registration request is currently in progress
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Handle registration form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e; // Prevent default form submission behavior (page reload)
     e.preventDefault();
+
+    // Disable repeated submissions while request is processing
     setIsSubmitting(true);
+
+    // Show loading message while registration request is in progress
     setMessage("Creating account...");
+
+    // Reset error state before attempting registration
     setIsError(false);
 
     try {
