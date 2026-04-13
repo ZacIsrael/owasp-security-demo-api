@@ -16,14 +16,28 @@ type User = {
 };
 
 export default function EditMePage() {
+  // Next.js router for client-side navigation after profile updates/redirects
   const router = useRouter();
 
+  // Stores the user's email address
   const [email, setEmail] = useState("");
+
+  // Stores the user's editable display name
   const [displayName, setDisplayName] = useState("");
+
+  // Stores the user's editable bio text
   const [bio, setBio] = useState("");
+
+  // Stores loading, success, or error messages displayed to the user
   const [message, setMessage] = useState("Loading user details...");
+
+  // Tracks whether initial user data is still loading
   const [isLoading, setIsLoading] = useState(true);
+
+  // Tracks whether the form submission request is in progress
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Tracks whether the current message represents an error state
   const [isError, setIsError] = useState(false);
 
   // Runs after component mounts to fetch authenticated user data
