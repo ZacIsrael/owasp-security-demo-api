@@ -3,6 +3,10 @@
 //   Used to verify that state-changing requests are intentional.
 //   In-memory only (for the purpose of the demonstartion; not production-safe).
 
+// In production, this in-memory CSRF token store would typically be replaced 
+// by a shared session store such as Redis, allowing token persistence across 
+// application restarts and horizontal scaling across multiple server instances.
+
 import crypto from "crypto";
 
 // In-memory store mapping a sessionId to a csrfToken.
