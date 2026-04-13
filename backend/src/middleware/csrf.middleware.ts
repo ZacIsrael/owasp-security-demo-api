@@ -53,10 +53,10 @@ export const csrfProtection = (
   }
 
   // Extract CSRF token from custom request header
-  const csrfHeader = req.header("x-csrf-token");
+  const csrfTokenFromRequest = req.header("x-csrf-token");
 
-  // Reject request if CSRF header is missing
-  if (!csrfHeader) {
+  // Reject request if CSRF token is missing
+  if (!csrfTokenFromRequest) {
     return res.status(403).json({
       success: false,
       error: "CSRF protection: missing x-csrf-token header",
@@ -75,7 +75,7 @@ export const csrfProtection = (
   }
 
   // Reject request if provided token does not match expected token
-  if (csrfHeader !== expectedToken) {
+  if (csrfTokenFromRequest !== expectedToken) {
     return res.status(403).json({
       success: false,
       error: "CSRF protection: invalid CSRF token",
