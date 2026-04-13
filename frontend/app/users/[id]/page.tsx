@@ -75,6 +75,9 @@ export default function UserProfilePage() {
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
+    // Wait until Next.js provides the dynamic route param before fetching user data
+    if (!params.id) return;
+
     // Normalize the dynamic route param into a single string ID
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
