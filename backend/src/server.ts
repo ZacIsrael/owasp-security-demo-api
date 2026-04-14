@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser";
 // import routes
 import authRouter from "./routes/auth.routes";
 import usersRouter from "./routes/users.routes";
+// CSP report route so the backend can receive browser violation reports
+import cspReportsRoutes from "./routes/cspReports.routes";
 
 // Loads environment variables from a `.env` file into process.env
 // Used for storing sensitive data like database credentials, API keys, etc.
@@ -45,6 +47,9 @@ app.use(
 // and makes the parsed data available on req.body
 app.use(express.json());
 
+// Parse CSP report payloads that may use a report-specific JSON content type
+app.use(express.json({ type: ["application/json", "application/csp-report"] }));
+
 // Parses incoming requests with application/x-www-form-urlencoded payloads
 // This is critical for the CSRF demo because malicious HTML forms (like evil.html)
 // do NOT send JSON — they send URL-encoded form data by default.
@@ -69,6 +74,7 @@ const API_VERSION = 1;
 // import routes
 app.use(`/api/v${API_VERSION}/auth`, authRouter);
 app.use(`/api/v${API_VERSION}/users`, usersRouter);
+app.use(`/api/v${API_VERSION}/csp-reports`, cspReportsRoutes);
 
 app.use(errorHandler);
 
