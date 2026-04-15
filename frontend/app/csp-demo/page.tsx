@@ -109,7 +109,7 @@ export default async function CspDemoPage() {
 
         {/* This inline style is trusted via SHA-256 hash rather than nonce */}
         <p>
-          This inline style block is here so we can later whitelist it using a
+          This inline style block is here so it can be later whitelisted using a
           SHA-256 hash in the CSP header.
         </p>
 
@@ -152,7 +152,8 @@ export default async function CspDemoPage() {
         {/* Explain why this iframe should violate the frame-src directive */}
         <p>
           If the CSP uses <code>frame-src 'self'</code>, the browser should
-          block this external iframe and show a CSP violation in DevTools.
+          block this external iframe and show a CSP violation in DevTools. Why?
+          Because the source of this iframe points to an external endpoint.
         </p>
 
         {/* Attempt to load an external iframe that should violate frame-src policy */}
