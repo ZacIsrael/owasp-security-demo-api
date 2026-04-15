@@ -198,9 +198,8 @@ export default async function CspDemoPage() {
         {/* Use Next.js Script instead of <script> so the listener reliably executes in the React/Next environment */}
         {/* The nonce allows this inline listener script to execute under the active CSP */}
         <Script
+          // Comment out the nonce to demonstrate CSP blocking this inline script
           nonce={nonce}
-          // Uncomment to intentionally break nonce validation (for demo purposes)
-          // nonce={'wilhbwi2eoun20'}
           dangerouslySetInnerHTML={{
             __html: `
               document.addEventListener("securitypolicyviolation", (event) => {
