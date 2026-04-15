@@ -184,15 +184,19 @@ export default async function CspDemoPage() {
       <section>
         <h2>7) Browser-side CSP violation listener</h2>
 
-        {/* This text will update when the browser fires a securitypolicyviolation event */}
+        {/* This text will be updated once the browser fires a securitypolicyviolation event */}
+        {/* Open DevTools Console as well; this page mirrors the most recent violation in-page */}
         <p id="violation-result">
-          Open DevTools Console too, but this page will also try to display the
-          last CSP violation it sees in the browser.
+          Browser has NOT fired a securitypolicyviolation event yet.
         </p>
 
-        {/* Listen for CSP violation events so violations can be displayed in-page */}
-        <script
+        {/* Register a browser-side CSP violation listener for real-time violation visibility */}
+        {/* Use Next.js Script instead of <script> so the listener reliably executes in the React/Next environment */}
+        {/* The nonce allows this inline listener script to execute under the active CSP */}
+        <Script
           nonce={nonce}
+          // Uncomment to intentionally break nonce validation (for demo purposes)
+          // nonce={'wilhbwi2eoun20'}
           dangerouslySetInnerHTML={{
             __html: `
               document.addEventListener("securitypolicyviolation", (event) => {
