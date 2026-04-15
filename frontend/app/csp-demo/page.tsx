@@ -116,11 +116,6 @@ export default async function CspDemoPage() {
         <h2>4) Hash-based inline style</h2>
 
         {/* This inline style is trusted via SHA-256 hash rather than nonce */}
-        <p>
-          This inline style block is here so it can be later whitelisted using a
-          SHA-256 hash in the CSP header.
-        </p>
-
         {/* Inject the exact inline CSS whose hash is hardcoded in middleware.ts */}
         <style
           dangerouslySetInnerHTML={{
