@@ -139,14 +139,19 @@ export default async function CspDemoPage() {
       <section>
         <h2>5) Hash-based inline script</h2>
 
-        {/* This text will change only if the hash-approved inline script executes */}
+        {/* This text will be modified ONLY if the hash-approved inline script executes */}
         <p id="hash-script-result">
-          If this text changes, the hash-approved inline script executed.
+          Hash-approved inline script has NOT executed yet.
         </p>
 
-        {/* Inject the exact inline JS whose hash is hardcoded in middleware.ts */}
-        <script
+        {/* Use Next.js Script so the browser executes this inline script after hydration completes */}
+        {/* The script content must exactly match the precomputed SHA-256 hash whitelisted in the CSP header */}
+        <Script
+          id="hash-script-demo"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
+            // Replace the approved JS with different content to intentionally invalidate the CSP hash
+            // __html: "lwbfrwrjfn",
             __html: hashScript,
           }}
         />
