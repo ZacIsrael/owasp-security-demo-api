@@ -4,6 +4,10 @@ export const dynamic = "force-dynamic";
 // Import Next.js headers() so we can read the nonce injected by middleware
 import { headers } from "next/headers";
 
+// Import Next.js Script component so inline scripts execute properly in React/Next environments
+// Raw <script> tags inside React-rendered JSX are not reliably executed by the framework
+import Script from "next/script";
+
 export default async function CspDemoPage() {
   // Read the nonce value that middleware will attach to the incoming request headers
   const headerStore = await headers();
@@ -87,15 +91,19 @@ export default async function CspDemoPage() {
         <p id="nonce-script-result">Nonce script has NOT executed yet.</p>
 
         {/* Inject inline JS that will only run if the nonce matches the CSP */}
-        <script
+        {/* Use Next.js Script instead of <script> so the browser executes this inline script after hydration completes */}
+        {/* The nonce allows CSP to trust and execute this otherwise-blocked inline script */}
+        <Script
+          id="nonce-script-demo"
           nonce={nonce}
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              const nonceResult = document.getElementById("nonce-script-result");
-              if (nonceResult) {
-                nonceResult.textContent = "Nonce-approved inline script executed.";
-              }
-            `,
+      const nonceResult = document.getElementById("nonce-script-result");
+      if (nonceResult) {
+        nonceResult.textContent = "Nonce-approved inline script executed.";
+      }
+    `,
           }}
         />
       </section>
