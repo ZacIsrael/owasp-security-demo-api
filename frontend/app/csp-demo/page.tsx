@@ -123,6 +123,8 @@ export default async function CspDemoPage() {
         <style
           dangerouslySetInnerHTML={{
             __html: hashStyle,
+            // Replace the approved CSS with different content to intentionally break the CSP hash match
+            // __html: 'lfbh3lrjn',
           }}
         />
 
