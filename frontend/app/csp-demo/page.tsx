@@ -84,9 +84,7 @@ export default async function CspDemoPage() {
         <h2>3) Nonce-based inline script</h2>
 
         {/* This text will be modified only if the nonce-approved script executes */}
-        <p id="nonce-script-result">
-          If this text changes, the nonce-based inline script executed.
-        </p>
+        <p id="nonce-script-result">Nonce script has NOT executed yet.</p>
 
         {/* Inject inline JS that will only run if the nonce matches the CSP */}
         <script
