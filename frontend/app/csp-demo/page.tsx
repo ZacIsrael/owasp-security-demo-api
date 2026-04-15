@@ -55,8 +55,7 @@ export default async function CspDemoPage() {
         {/* Explain why this inline style should only run when nonce matches the CSP */}
         <p>
           Since the CSP header includes <code>style-src 'nonce-...'</code> and this{" "}
-          <code>{`<style>`}</code> tag uses the same nonce, the browser should
-          will allow it.
+          <code>{`<style>`}</code> tag uses the same nonce, the browser will allow it.
         </p>
 
         {/* Inject inline CSS that will only be allowed if the nonce matches the CSP */}
