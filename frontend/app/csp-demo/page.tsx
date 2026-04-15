@@ -164,9 +164,12 @@ export default async function CspDemoPage() {
 
         {/* Explain why this iframe should violate the frame-src directive */}
         <p>
-          If the CSP uses <code>frame-src 'self'</code>, the browser should
-          block this external iframe and show a CSP violation in DevTools. Why?
-          Because the source of this iframe points to an external endpoint.
+          Since the CSP uses <code>frame-src 'self'</code>, the browser will
+          block this external iframe and show a CSP violation in DevTools.
+        </p>
+        <p>
+          {" "}
+          Why? Because the source of this iframe points to an external endpoint.
         </p>
 
         {/* Attempt to load an external iframe that should violate frame-src policy */}
