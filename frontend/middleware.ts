@@ -1,3 +1,8 @@
+// Next.js automatically executes this middleware before rendering
+// any route matched by the config.matcher at the bottom of this file.
+// It preprocesses the request/response pipeline, allowing CSP headers
+// and nonce data to be injected before page render.
+
 // Import Next.js request/response types for middleware support
 import { NextRequest, NextResponse } from "next/server";
 
