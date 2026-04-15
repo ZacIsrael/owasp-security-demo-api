@@ -96,6 +96,7 @@ export default async function CspDemoPage() {
         {/* The nonce allows CSP to trust and execute this otherwise-blocked inline script */}
         <Script
           id="nonce-script-demo"
+          // Comment out the nonce to demonstrate CSP blocking this inline script
           nonce={nonce}
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
